@@ -5,7 +5,7 @@
 		['email' => "rikardo_cavaleiro@gmail.com", 'senha' => "aleatoria3"]
 	);
 
-	$autenticado = false;
+	$autenticado = false; # Variável de autenticação
 
 	foreach ($usuarios as $usuario) {
 		if($_POST['email'] == $usuario['email'] && $_POST['senha'] == $usuario['senha']){
@@ -15,8 +15,8 @@
 	}
 
 	if($autenticado) {
-		echo "Usuário autenticado";
+		header("Location: home.php");
 	} else {
-		echo "Fudeu.";
+		header("Location: index.php?login=erro");
 	}
 ?>
