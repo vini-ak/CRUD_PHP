@@ -1,4 +1,11 @@
 <?php
+	
+	# Iniciando a sessão do PHP
+	session_start();
+
+	if(!isset($_SESSION['autenticado']) || $_SESSION != 'SIM') {
+		header("Location: index.php?login=erro_autenticacao");
+	}
 	require_once('navbar.html');
 ?>
 
