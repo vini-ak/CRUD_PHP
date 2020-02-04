@@ -1,6 +1,7 @@
 <?php
 	# Importando a navbar
 	require_once('navbar.html');
+	session_start();
 ?>
 
 <!DOCTYPE html>
@@ -26,28 +27,23 @@
 		  </div>
 
 
+		  <!-- Apresentação de mensagens de erro. -->
 		  <?php
 			if(isset($_GET['login'])){
 			  # Verificação de validez de usuário
 		  	  if($_GET['login'] == 'usuario_senha') {
 		  ?>
-			  <p class="text-danger">Email ou senha inválidos.</p>
+				<p class="text-danger">Email ou senha inválidos.</p>
 		  <?php
 		  	  # Proteção de rotas
 		  	  } else if($_GET['login'] == 'erro_autenticacao') {  		
 		  ?>
-		  	  <p class="text-info">Problema de autenticação. Faça login novamente.</p>
+		  		<p class="text-info">Problema de autenticação. Faça login novamente.</p>
 		  <?php
 			  }
 			}
 		  ?>
 
-
-		  <!-- Checkbox -->
-		  <div class="form-check">
-		    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-		    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-		  </div>
 		  <button type="submit" class="btn btn-success mt-5">Submit</button>
 		</form>
 

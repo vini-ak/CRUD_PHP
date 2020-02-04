@@ -3,7 +3,8 @@
 	# Iniciando a sessão do PHP
 	session_start();
 
-	if(!isset($_SESSION['autenticado']) || $_SESSION != 'SIM') {
+	if((!isset($_SESSION['autenticado'])) || $_SESSION['autenticado'] != "SIM") {
+		print_r($_SESSION);
 		header("Location: index.php?login=erro_autenticacao");
 	}
 	require_once('navbar.html');

@@ -20,10 +20,10 @@
 	}
 
 	if($usuario_autenticado) {
-		header("Location: home.php");
 		$_SESSION['autenticado'] = 'SIM';
+		header("Location: home.php");
 	} else {
-		header("Location: index.php?login=usuario_senha");
 		$_SESSION['autenticado'] = 'NAO';
+		header("Location: index.php?login=usuario_senha");
 	}
 ?>
