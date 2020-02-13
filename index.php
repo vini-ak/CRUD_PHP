@@ -2,6 +2,10 @@
 	# Importando a navbar
 	require_once('navbar.html');
 	session_start();
+
+	if(isset($_SESSION['autenticado']) && $_SESSION['autenticado'] == 'SIM') {
+		header('Location: home.php');
+	}
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +48,7 @@
 			}
 		  ?>
 
-		  <button type="submit" class="btn btn-success mt-5">Submit</button>
+		  <button type="submit" class="btn btn-success mt-5">Login</button>
 		</form>
 
 
