@@ -23,6 +23,19 @@
 		}
 	</style>
 
+	<script type="text/javascript">
+		function topegandoar() {
+			let ajax = new XMLHttpRequest()
+			ajax.open('GET', 'atualizar_tarefa.php')
+			ajax.onreadystatechange = () => {
+				if(ajax.readyState == 4 && ajax.status == 200) {
+					console.log(JSON.parse(ajax.responseText))
+				}
+			}
+			ajax.send()
+		}
+	</script>
+
 </head>
 <body style="font-family: monospace, OCR A Std">
 	<h1 class="text-success text-center text-monospace" style="padding-top: 200px; padding-bottom: 40px">Atividades</h1>
@@ -39,12 +52,11 @@
 		Caso hajam tarefas, será criada uma lista de tarefas com variação de cores.
 		*/
 		} else {
-
 			foreach ($_SESSION['atividades'] as $atividade) {
-				$atividade = unserialize($atividade);
 				?>
-				<button type="button" class="btn btn-md btn-block btn-outline-success" data-toggle="modal" data-target="#modal_atividade">
+				<button type="button" onclick="topegandoar()" class="btn btn-md btn-block btn-outline-success" data-toggle="modal" data-target="#idModalAtividade">
 					<?php
+					$atividade = unserialize($atividade);
 					echo $atividade->__get('nome');
 					?>
 				</button>
@@ -104,25 +116,19 @@
 		</div>	
 	</div>
 
-	<div class="modal" id="modal_atividade" tabindex="-1" role="dialog">
-		<div class="modal-dialog" role="document">
-    		<div class="modal-content">
-    			<div class="modal-header">
-					<h5 class="modal-title">
-						<?php
-							echo $atividade->__get('nome');
-						?>
-					</h5>
+
+	<div class="modal fade" id = "idModalAtividade">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 id="titulo_atividade">Titulo</h3>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
 				<div class="modal-body">
-					
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-					<button type="button" class="btn btn-primary">Salvar mudanças</button>
+					<p id="descricao_atividade">Descrição</p>
+					<p id="prazo_atividade">00:00</p>
 				</div>
 			</div>
 		</div>

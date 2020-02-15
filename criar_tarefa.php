@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <?php
 	session_start();
 	include('atividade.php');	# Método para chamar a classe atividade.

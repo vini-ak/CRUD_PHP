@@ -2,9 +2,9 @@
 
 	class Atividade {
 		
-		private $nome = null;
-		private $data_entrega = null;
-		private $descricao = null;
+		public $nome = null;
+		public $deadline = null;
+		public $descricao = null;
 
 		/* 
 		Tempo:
