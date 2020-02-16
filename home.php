@@ -5,16 +5,19 @@
 	# Iniciando a sessão do PHP
 	session_start();
 
+	// Verificando se o usuário está autenticado. Caso não esteja, será redirecionado à index.php
 	if((!isset($_SESSION['autenticado'])) || $_SESSION['autenticado'] != "SIM") {
 		header("Location: index.php?login=erro_autenticacao");
 	}
 	require_once('navbar.html');
 
 
-	if(isset($_GET['id'])) {
-		$sessao = unserialize($_SESSION['atividades']);
-		echo $_GET['id'];
+	// Caso seja passado um id a ser deletado, ele será removido da session e a página será recarregada
+	if(isset($_GET['delete_id'])) {
+		array_splice($_SESSION['atividades'], $_GET['delete_id'], 1);
+		header('Location: home.php');
 	}
+
 ?>
 
 <!DOCTYPE html>
@@ -46,13 +49,26 @@
 					}
 				}
 			}
-
 			ajax.send()
+
+			elemento = indice // Mudando o valor da variável global para poder auxiliar na deleção e alteração
 		}
+
+
+		function deletar(indice) {
+			// Recarrega a página passando o id a ser deletado e aponta para a home.php
+			console.log(indice)
+			location = location.href + `?delete_id=${indice}`
+		}
+
+
 	</script>
 
 </head>
 <body style="font-family: monospace, OCR A Std">
+	<script type="text/javascript">
+		var elemento = null;
+	</script>
 	<h1 class="text-success text-center text-monospace" style="padding-top: 200px; padding-bottom: 40px">Atividades</h1>
 	<?php
 		/*
@@ -145,7 +161,7 @@
 				</div>
 				<div class="modal-footer">
 					<button class="btn btn-secondary" data-dismiss="modal" aria-label="Fechar">Fechar</button>
-					<button class="btn btn-danger" type="button">Deletar atividade</button>
+					<button class="btn btn-danger" onclick="deletar(elemento)" type="submit">Deletar atividade</button>
 					<button class="btn btn-primary" type="button">Editar</button>
 				</div>
 			</div>
