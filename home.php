@@ -9,6 +9,12 @@
 		header("Location: index.php?login=erro_autenticacao");
 	}
 	require_once('navbar.html');
+
+
+	if(isset($_GET['id'])) {
+		$sessao = unserialize($_SESSION['atividades']);
+		echo $_GET['id'];
+	}
 ?>
 
 <!DOCTYPE html>
@@ -24,14 +30,23 @@
 	</style>
 
 	<script type="text/javascript">
-		function topegandoar() {
+		function getTarefa(indice) {
+			
 			let ajax = new XMLHttpRequest()
-			ajax.open('GET', 'atualizar_tarefa.php')
+			ajax.open('GET', 'converter_SESSION_to_JSON.php')
 			ajax.onreadystatechange = () => {
 				if(ajax.readyState == 4 && ajax.status == 200) {
-					console.log(JSON.parse(ajax.responseText))
+					let atividades = JSON.parse(ajax.responseText)
+					console.log(atividades)
+
+					if(atividades){
+						document.getElementById('titulo_atividade').innerHTML = atividades[indice]['nome']
+						document.getElementById('descricao_atividade').innerHTML = atividades[indice]['descricao']
+						document.getElementById('prazo_atividade').innerHTML = atividades[indice]['deadline']
+					}
 				}
 			}
+
 			ajax.send()
 		}
 	</script>
@@ -39,7 +54,6 @@
 </head>
 <body style="font-family: monospace, OCR A Std">
 	<h1 class="text-success text-center text-monospace" style="padding-top: 200px; padding-bottom: 40px">Atividades</h1>
-
 	<?php
 		/*
 		Caso não hajam tarefas a serem executadas, será mostrada uma mensagem de que não há tarefas
@@ -52,15 +66,14 @@
 		Caso hajam tarefas, será criada uma lista de tarefas com variação de cores.
 		*/
 		} else {
+			$idButton = 0;
 			foreach ($_SESSION['atividades'] as $atividade) {
-				?>
-				<button type="button" onclick="topegandoar()" class="btn btn-md btn-block btn-outline-success" data-toggle="modal" data-target="#idModalAtividade">
-					<?php
-					$atividade = unserialize($atividade);
-					echo $atividade->__get('nome');
-					?>
-				</button>
-			<?php
+				$atividade = unserialize($atividade);
+				echo "<button type='button' onclick='getTarefa(\"$idButton\")'' class='btn btn-md btn-block btn-outline-success' data-toggle='modal' data-target='#idModalAtividade'>";
+					echo $atividade->__get('nome');	
+				echo "</button>";
+				
+				$idButton += 1;
 			}
 		}
 	?>
@@ -129,6 +142,11 @@
 				<div class="modal-body">
 					<p id="descricao_atividade">Descrição</p>
 					<p id="prazo_atividade">00:00</p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-secondary" data-dismiss="modal" aria-label="Fechar">Fechar</button>
+					<button class="btn btn-danger" type="button">Deletar atividade</button>
+					<button class="btn btn-primary" type="button">Editar</button>
 				</div>
 			</div>
 		</div>
