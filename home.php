@@ -62,6 +62,64 @@
 		}
 
 
+		function reload(){
+			location = location
+		}
+
+
+		function alterar(indice) {
+
+			let ajax = new XMLHttpRequest()
+			ajax.open('GET', 'formulario.html')
+
+			ajax.onreadystatechange = () => {
+				if(ajax.readyState == 4 && ajax.status == 200) {
+					document.getElementById('conteudo_tarefa').innerHTML = ajax.responseText
+
+					// Adicionando um id para fazer a alteração em _SESSION
+					let new_div = document.createElement('div')
+					new_div.setAttribute('class', 'form-group')
+
+					let hidden = document.createElement('input')
+					hidden.setAttribute('id', 'id_hidden')
+					hidden.setAttribute('type', 'hidden')
+					hidden.setAttribute('name', 'idAlteracao')
+					hidden.setAttribute('value', elemento)
+
+					new_div.appendChild(hidden)
+					document.getElementById('formAlteracao').appendChild(new_div)
+
+					// Criando o botão de fechar
+					let fechar = document.createElement('button')
+					let descFechar = document.createTextNode('Fechar')
+					fechar.appendChild(descFechar)
+
+					fechar.setAttribute('class', 'btn btn-secondary')
+					fechar.setAttribute('data-dismiss', 'modal')
+					fechar.setAttribute('aria-label', 'Fechar')
+					fechar.setAttribute('onclick', 'reload()')
+
+					// Criando o botão submit
+					let submit = document.createElement('button')
+					let descSubmit = document.createTextNode('Enviar alterações')
+					submit.appendChild(descSubmit)
+
+					submit.setAttribute('class', 'btn btn-info')
+					submit.setAttribute('aria-label', 'Enviar alterações')
+					submit.setAttribute('form', 'formAlteracao')
+					//submit.setAttribute('onclick', 'reload()') -> Falta definir o onclick!!!!!
+
+					// Adding it all together
+					document.getElementById('footer_tarefa').innerHTML = ""
+					document.getElementById('footer_tarefa').appendChild(fechar)
+					document.getElementById('footer_tarefa').appendChild(submit)
+
+				} 
+			}
+
+			ajax.send()
+			
+		}
 	</script>
 
 </head>
@@ -155,14 +213,14 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body" id="conteudo_tarefa">
 					<p id="descricao_atividade">Descrição</p>
 					<p id="prazo_atividade">00:00</p>
 				</div>
-				<div class="modal-footer">
+				<div class="modal-footer" id="footer_tarefa">
 					<button class="btn btn-secondary" data-dismiss="modal" aria-label="Fechar">Fechar</button>
-					<button class="btn btn-danger" onclick="deletar(elemento)" type="submit">Deletar atividade</button>
-					<button class="btn btn-primary" type="button">Editar</button>
+					<button class="btn btn-danger" onclick="deletar(elemento)" type="button">Deletar atividade</button>
+					<button class="btn btn-primary" onclick="alterar(elemento)" type="button">Editar</button>
 				</div>
 			</div>
 		</div>
