@@ -1,37 +1,34 @@
-<meta charset="utf-8">
 <?php
 	session_start();
-	include('atividade.php');	# Método para chamar a classe atividade.
 
-	# Será um parâmetro via post com o nome da atividade o objeto atividade
-	if(!isset($_SESSION['atividades'])){
-		$_SESSION['atividades'] = array();
+	// Verificando se o usuário está autenticado. Caso não esteja, será redirecionado à index.php
+	if((!isset($_SESSION['autenticado'])) || $_SESSION['autenticado'] != "SIM") {
+		header("Location: index.php?login=erro_autenticacao");
 	}
 
-	# Verificando os nomes das atividades:
-	# Para ser validado, o título deve ter mais de três caracteres e não nulo.
-	if(mb_strlen($_GET['titulo']) < 3) {
-		header("Location: home.php?erro_atividade=nome_invalido");
+	
+	try {
+		$conexao = new PDO('mysql:host=localhost;dbname=kyoto', 'root', '');
+
+		$query = 'INSERT INTO tb_tarefas(id_user, titulo, descricao, data_hora)';
+		$query .= "VALUES(:usuario, :titulo, :descricao, :data_hora)";
+
+		$stm = $conexao->prepare($query);
+
+		$stm->bindValue(':usuario', $_SESSION['id_user']);
+		$stm->bindValue(':titulo', $_GET['titulo']);
+		$stm->bindValue(':descricao', $_GET['descricao']);
+
+		$data_hora = $_GET['ano'].'/'.$_GET['mes'].'/'.$_GET['dia'].' '.$_GET['horas'].':'.$_GET['minutos'].':00';
+		$stm->bindValue(':data_hora', $data_hora);
+
+		$stm->execute();
+
+		$usuario_autenticado = true;
+
+	} catch (Exception $e){
+		$usuario_autenticado = false;
 	}
 
-	# Verificando os formatos de data e hora:
-	# Formato hora: 24
-	# Usando checkdate() para verificar se a data inputada é válida.
-	if(!checkdate($_GET['mes'], $_GET['dia'], $_GET['ano']) || !($_GET['horas'] >= 0 && $_GET['horas'] < 24) || !($_GET['minutos'] >= 0 && $_GET['minutos'] < 60)) {
-		header("Location: home.php?erro_atividade=horario_invalido");
-	}
-
-	$nova_atividade = new Atividade();
-	$nova_atividade->mudarNomeAtividade($_GET['titulo']);
-	$nova_atividade->mudarDescricao($_GET['descricao']);
-	$nova_atividade->mudarDataEntrega($_GET['horas'], $_GET['minutos'], $_GET['dia'], $_GET['mes'], $_GET['ano']);
-
-	# Serializando...
-	echo "<pre>";
-	print_r($nova_atividade);
-	echo "</pre>";
-	$nova_atividade = serialize($nova_atividade);
-
-	array_push($_SESSION['atividades'], $nova_atividade);
 	header("Location: home.php");
 ?>

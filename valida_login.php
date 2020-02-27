@@ -3,20 +3,36 @@
 	# Iniciando a sessão do PHP...
 	session_start();
 
+	// Verificando se o usuário está autenticado. Caso não esteja, será redirecionado à index.php
+	if((!isset($_SESSION['autenticado'])) || $_SESSION['autenticado'] != "SIM") {
+		header("Location: index.php?login=erro_autenticacao");
+	}
 
-	$usuarios = array(
-		['email' => "vinicius.vdes@gmail.com", 'senha' => "aleatoria1"],
-		['email' => "kyotoloja@gmail.com", 'senha' => "aleatoria2"],
-		['email' => "rikardo_cavaleiro@gmail.com", 'senha' => "aleatoria3"]
-	);
+	
+	$conexao = new PDO('mysql:host=localhost;dbname=kyoto', 'root', '');
 
-	$usuario_autenticado = false; # Variável de autenticação
+	try {
+		$query = 'SELECT id_user FROM tb_usuarios WHERE ';
+		$query .= "email = :email ";
+		$query .= "AND senha = :senha ";
 
-	foreach ($usuarios as $usuario) {
-		if($_POST['email'] == $usuario['email'] && $_POST['senha'] == $usuario['senha']){
+		$stm = $conexao->prepare($query);
+
+		$stm->bindValue(':email', $_POST['email']);
+		$stm->bindValue(':senha', $_POST['senha']);
+
+		$stm->execute();
+
+		$_SESSION['id_user'] = $stm->fetchAll(PDO::FETCH_ASSOC)[0]['id_user'];
+
+		if($_SESSION['id_user'] != []) {
 			$usuario_autenticado = true;
-			break;
+		} else {
+			$usuario_autenticado = false;
 		}
+
+	} catch (Exception $e){
+		$usuario_autenticado = false;
 	}
 
 	if($usuario_autenticado) {

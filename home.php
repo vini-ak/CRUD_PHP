@@ -1,6 +1,4 @@
 <?php
-	#Chamando a classe Atividade só para não haver erros
-	require('atividade.php');
 
 	# Iniciando a sessão do PHP
 	session_start();
@@ -14,7 +12,9 @@
 
 	// Caso seja passado um id a ser deletado, ele será removido da session e a página será recarregada
 	if(isset($_GET['delete_id'])) {
-		array_splice($_SESSION['atividades'], $_GET['delete_id'], 1);
+		$conn = new PDO('mysql:host=localhost;dbname=kyoto', 'root', '');
+		$query = 'DELETE FROM tb_tarefas WHERE id_tarefa = '.$_GET['delete_id'];
+		$stm = $conn->query($query);
 		header('Location: home.php');
 	}
 
@@ -27,7 +27,7 @@
 	<title>Página Inicial</title>
 	<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 	<style type="text/css">
-		body {
+		.botoes_tarefa {
 			background: linear-gradient(to right, #c7ea46, #d0f0c0, #98fb98);
 		}
 	</style>
@@ -36,16 +36,19 @@
 		function getTarefa(indice) {
 			
 			let ajax = new XMLHttpRequest()
-			ajax.open('GET', 'converter_SESSION_to_JSON.php')
+			let link = `converter_SESSION_to_JSON.php?id=${indice}`
+			console.log(link)
+			ajax.open('GET', link)
 			ajax.onreadystatechange = () => {
 				if(ajax.readyState == 4 && ajax.status == 200) {
+					console.log(ajax.responseText)
 					let atividades = JSON.parse(ajax.responseText)
 					console.log(atividades)
 
 					if(atividades){
-						document.getElementById('titulo_atividade').innerHTML = atividades[indice]['nome']
-						document.getElementById('descricao_atividade').innerHTML = atividades[indice]['descricao']
-						document.getElementById('prazo_atividade').innerHTML = atividades[indice]['deadline']
+						document.getElementById('titulo_atividade').innerHTML = atividades['titulo']
+						document.getElementById('descricao_atividade').innerHTML = atividades['descricao']
+						document.getElementById('prazo_atividade').innerHTML = atividades['data_hora']
 					}
 				}
 			}
@@ -107,6 +110,7 @@
 					submit.setAttribute('class', 'btn btn-info')
 					submit.setAttribute('aria-label', 'Enviar alterações')
 					submit.setAttribute('form', 'formAlteracao')
+					submit.setAttribute('type', 'submit')
 					//submit.setAttribute('onclick', 'reload()') -> Falta definir o onclick!!!!!
 
 					// Adding it all together
@@ -129,10 +133,18 @@
 	</script>
 	<h1 class="text-success text-center text-monospace" style="padding-top: 200px; padding-bottom: 40px">Atividades</h1>
 	<?php
+		$conexao = new PDO('mysql:host=localhost;dbname=kyoto', 'root', '');
+			
+		$query = "SELECT id_tarefa, titulo FROM tb_tarefas WHERE ";
+		$query .= " id_user = ".$_SESSION['id_user'];
+
+		$statement = $conexao->query($query);
+		$lista_tarefas = $statement->fetchAll(PDO::FETCH_ASSOC);
+		
 		/*
 		Caso não hajam tarefas a serem executadas, será mostrada uma mensagem de que não há tarefas
 		*/
-		if(!isset($_SESSION['atividades']) || $_SESSION['atividades'] == []){
+		if($lista_tarefas == []) {
 			?>
 			<h3 class="text-secondary text-center" style="padding-top: 20px;">Você ainda não possui atividades :/</h3>
 			<?php
@@ -140,14 +152,12 @@
 		Caso hajam tarefas, será criada uma lista de tarefas com variação de cores.
 		*/
 		} else {
-			$idButton = 0;
-			foreach ($_SESSION['atividades'] as $atividade) {
-				$atividade = unserialize($atividade);
-				echo "<button type='button' onclick='getTarefa(\"$idButton\")'' class='btn btn-md btn-block btn-outline-success' data-toggle='modal' data-target='#idModalAtividade'>";
-					echo $atividade->__get('nome');	
+			foreach ($lista_tarefas as $atividade) {
+				$id_tarefa = $atividade['id_tarefa'];
+				echo "<button type='button' onclick='getTarefa(\"$id_tarefa\")' class='btn btn-md btn-block botoes_tarefa' data-toggle='modal' data-target='#idModalAtividade'>";
+					echo $atividade['titulo'];	
 				echo "</button>";
 				
-				$idButton += 1;
 			}
 		}
 	?>

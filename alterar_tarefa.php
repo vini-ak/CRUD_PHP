@@ -1,7 +1,10 @@
 <?php
 	session_start();
-	require('atividade.php');
 
+	// Verificando se o usuário está autenticado. Caso não esteja, será redirecionado à index.php
+	if((!isset($_SESSION['autenticado'])) || $_SESSION['autenticado'] != "SIM") {
+		header("Location: index.php?login=erro_autenticacao");
+	}
 
 
 	# Verificando os nomes das atividades:
@@ -19,15 +22,21 @@
 
 
 
-	// Pegando o objeto
-	$sessao = unserialize($_SESSION['atividades'][$_GET['idAlteracao']]);
+	$conn = new PDO('mysql:host=localhost;dbname=kyoto', 'root', '');
+	$query = "UPDATE tb_tarefas SET ";
+	$query .= "titulo = :titulo, descricao = :descricao, data_hora = :novoHorario ";
+	$query .= "WHERE id_tarefa = :id_tarefa"; 
 
-	// Setando os novos valores
-	$sessao->mudarNomeAtividade($_GET['titulo']);
-	$sessao->mudarDataEntrega($_GET['horas'], $_GET['minutos'], $_GET['dia'], $_GET['mes'], $_GET['ano']);
-	$sessao->mudarDescricao($_GET['descricao']);
+	# Preparando a execução da query.
+	$stm = $conn->prepare($query);
 
-	// Voltando ao normal...
-	$_SESSION['atividades'][$_GET['idAlteracao']] = serialize($sessao);
+	$stm->bindValue(':titulo', $_GET['titulo']);
+	$stm->bindValue(':descricao', $_GET['descricao']);
+	$novoHorario = $_GET['ano'].'/'.$_GET['mes'].'/'.$_GET['dia'].' '.$_GET['horas'].':'.$_GET['minutos'].':00';
+	$stm->bindValue(':novoHorario', $novoHorario);
+	$stm->bindValue(':id_tarefa', $_GET['idAlteracao']);
+
+	$stm->execute();
+	
 	header("Location: home.php");
 ?>
