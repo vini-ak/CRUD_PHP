@@ -10,14 +10,6 @@
 	require_once('navbar.html');
 
 
-	// Caso seja passado um id a ser deletado, ele será removido da session e a página será recarregada
-	if(isset($_GET['delete_id'])) {
-		$conn = new PDO('mysql:host=localhost;dbname=kyoto', 'root', '');
-		$query = 'DELETE FROM tb_tarefas WHERE id_tarefa = '.$_GET['delete_id'];
-		$stm = $conn->query($query);
-		header('Location: home.php');
-	}
-
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +28,7 @@
 		function getTarefa(indice) {
 			
 			let ajax = new XMLHttpRequest()
-			let link = `converter_SESSION_to_JSON.php?id=${indice}`
+			let link = `get_tarefa.php?id=${indice}`
 			console.log(link)
 			ajax.open('GET', link)
 			ajax.onreadystatechange = () => {
@@ -59,9 +51,8 @@
 
 
 		function deletar(indice) {
-			// Recarrega a página passando o id a ser deletado e aponta para a home.php
-			console.log(indice)
-			location = location.href + `?delete_id=${indice}`
+			// Aponta para deletar_tarefa.php passando a id_tarefa a ser removida.
+			location = "http://localhost/CRUD_PHP/deletar_tarefa.php" + `?delete_id=${indice}`
 		}
 
 
